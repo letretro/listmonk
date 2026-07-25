@@ -138,6 +138,7 @@ func (z *ZeptoMail) Push(m models.Message) error {
 	}
 
 	req.Header.Set(hdrContentType, "application/json")
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set(authHeaderKey, authScheme+" "+z.conf.APIKey)
 	req.Header.Set("User-Agent", "listmonk")
 
@@ -151,7 +152,10 @@ func (z *ZeptoMail) Push(m models.Message) error {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("zeptomail: API error (HTTP %d): failed to read response body: %v", resp.StatusCode, err)
+		}
 		var ae apiError
 		if err := json.Unmarshal(bodyBytes, &ae); err == nil && ae.Error.Message != "" {
 			return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, ae.Error.Message)
