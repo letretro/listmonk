@@ -53,17 +53,17 @@
             <hr />
 
             <div class="columns">
-              <div class="column is-4">
-                <b-field :label="$t('settings.zeptomail.trackOpens')" label-position="on-border">
+              <div class="column">
+                <b-field>
                   <b-switch v-model="item.track_opens" name="track_opens">
-                    {{ $t('globals.states.enabled') }}
+                    {{ $t('settings.zeptomail.trackOpens') }}
                   </b-switch>
                 </b-field>
               </div>
-              <div class="column is-4">
-                <b-field :label="$t('settings.zeptomail.trackClicks')" label-position="on-border">
+              <div class="column">
+                <b-field>
                   <b-switch v-model="item.track_clicks" name="track_clicks">
-                    {{ $t('globals.states.enabled') }}
+                    {{ $t('settings.zeptomail.trackClicks') }}
                   </b-switch>
                 </b-field>
               </div>
