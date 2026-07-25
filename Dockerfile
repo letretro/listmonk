@@ -30,4 +30,4 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 EXPOSE 9000
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["./listmonk"]
+CMD ["sh", "-c", "./listmonk --install --yes --idempotent && ./listmonk --config ''"]
