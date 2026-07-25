@@ -289,7 +289,7 @@ INSERT INTO settings (key, value) VALUES
         '[{"enabled":true, "host":"smtp.yoursite.com","port":25,"auth_protocol":"cram","username":"username","password":"password","hello_hostname":"","max_conns":10,"idle_timeout":"15s","wait_timeout":"5s","max_msg_retries":2,"msg_retry_delay":"10ms","tls_type":"STARTTLS","tls_skip_verify":false,"email_headers":[], "from_addresses":[]},
           {"enabled":false, "host":"smtp.gmail.com","port":465,"auth_protocol":"login","username":"username@gmail.com","password":"password","hello_hostname":"","max_conns":10,"idle_timeout":"15s","wait_timeout":"5s","max_msg_retries":2,"msg_retry_delay":"10ms","tls_type":"TLS","tls_skip_verify":false,"email_headers":[], "from_addresses":[]}]'),
     ('messengers', '[]'),
-    ('zeptomail', '[]'),
+    ('zeptomail', '[{"name":"ZeptoMail","enabled":false,"api_key":"","from_email":"","from_name":"","track_opens":true,"track_clicks":true,"timeout":"30s","max_msg_retries":2}]'),
     ('bounce.enabled', 'false'),
     ('bounce.webhooks_enabled', 'false'),
     ('bounce.actions', '{"soft": {"count": 2, "action": "none"}, "hard": {"count": 1, "action": "blocklist"}, "complaint" : {"count": 1, "action": "blocklist"}}'),
