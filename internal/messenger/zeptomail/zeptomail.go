@@ -133,7 +133,7 @@ func (z *ZeptoMail) Push(m models.Message) error {
 	var lastErr error
 	for i := 0; i < 2; i++ {
 		if i > 0 {
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(3 * time.Second)
 		}
 		lastErr = z.pushOnce(m)
 		if lastErr == nil {
