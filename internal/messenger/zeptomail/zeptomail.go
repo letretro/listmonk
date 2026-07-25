@@ -20,7 +20,7 @@ const (
 	apiBaseURL     = "https://api.zeptomail.com/v1.1/email"
 	authHeaderKey  = "Authorization"
 	authScheme     = "Zoho-enczapikey"
-	hdrContentType = "application/json"
+	hdrContentType = "Content-Type"
 )
 
 // Config holds ZeptoMail API configuration.
@@ -48,7 +48,7 @@ type apiPayload struct {
 	TrackOpens  bool               `json:"track_opens"`
 	TrackClicks bool               `json:"track_clicks"`
 	Attachments []*apiAttachment   `json:"attachments,omitempty"`
-	ReplyTo     *address           `json:"reply_to,omitempty"`
+	ReplyTo     []*address         `json:"reply_to,omitempty"`
 	Headers     []*apiHeader       `json:"headers,omitempty"`
 }
 
@@ -197,7 +197,7 @@ func (z *ZeptoMail) buildPayload(m models.Message) *apiPayload {
 	}
 
 	if fromAddr != "" {
-		p.ReplyTo = &address{Address: fromAddr}
+		p.ReplyTo = []*address{{Address: fromAddr}}
 	}
 
 	switch m.ContentType {
