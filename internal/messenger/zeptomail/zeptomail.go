@@ -2,10 +2,12 @@ package zeptomail
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/mail"
 	"net/textproto"
@@ -109,6 +111,9 @@ func New(conf Config) (*ZeptoMail, error) {
 		c: &http.Client{
 			Timeout: timeout,
 			Transport: &http.Transport{
+				DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
+					return (&net.Dialer{Timeout: timeout}).DialContext(ctx, "tcp4", addr)
+				},
 				MaxIdleConnsPerHost:   10,
 				MaxConnsPerHost:       10,
 				ResponseHeaderTimeout: timeout,
