@@ -3,7 +3,7 @@ WORKDIR /build
 COPY frontend/package.json frontend/yarn.lock ./
 RUN mkdir -p /static/public/static/ && yarn install --frozen-lockfile
 COPY frontend/ .
-RUN yarn build
+RUN npx vite build
 
 FROM golang:alpine AS builder
 WORKDIR /build
