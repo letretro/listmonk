@@ -46,6 +46,7 @@ import (
 	"github.com/knadh/listmonk/internal/media/providers/s3"
 	"github.com/knadh/listmonk/internal/messenger/email"
 	"github.com/knadh/listmonk/internal/messenger/postback"
+	"github.com/knadh/listmonk/internal/messenger/zeptomail"
 	"github.com/knadh/listmonk/internal/notifs"
 	"github.com/knadh/listmonk/internal/subimporter"
 	"github.com/knadh/listmonk/models"
@@ -750,6 +751,36 @@ func initPostbackMessengers(ko *koanf.Koanf) []manager.Messenger {
 	return out
 }
 
+// initZeptoMailMessengers initializes and returns all enabled ZeptoMail messenger backends.
+func initZeptoMailMessengers() []manager.Messenger {
+	items := ko.Slices("zeptomail")
+	if len(items) == 0 {
+		return nil
+	}
+
+	var out []manager.Messenger
+	for _, item := range items {
+		if !item.Bool("enabled") {
+			continue
+		}
+
+		var cfg zeptomail.Config
+		if err := item.UnmarshalWithConf("", &cfg, koanf.UnmarshalConf{Tag: "json"}); err != nil {
+			lo.Fatalf("error reading ZeptoMail config: %v", err)
+		}
+
+		msgr, err := zeptomail.New(cfg)
+		if err != nil {
+			lo.Fatalf("error initializing ZeptoMail messenger: %v", err)
+		}
+		out = append(out, msgr)
+
+		lo.Printf("loaded ZeptoMail messenger: %s", cfg.Name)
+	}
+
+	return out
+}
+
 // initMediaStore initializes Upload manager with a custom backend.
 func initMediaStore(ko *koanf.Koanf) media.Store {
 	switch provider := ko.String("upload.provider"); provider {
@@ -763,6 +794,28 @@ func initMediaStore(ko *koanf.Koanf) media.Store {
 			lo.Fatalf("error initializing s3 upload provider %s", err)
 		}
 		lo.Println("media upload provider: s3")
+		return up
+
+	case "r2":
+		expiry, _ := time.ParseDuration(ko.String("upload.r2.expiry"))
+		accountID := ko.String("upload.r2.account_id")
+
+		up, err := s3.NewS3Store(s3.Opt{
+			URL:        fmt.Sprintf("https://%s.r2.cloudflarestorage.com", accountID),
+			PublicURL:  ko.String("upload.r2.public_url"),
+			AccessKey:  ko.String("upload.r2.access_key_id"),
+			SecretKey:  ko.String("upload.r2.secret_access_key"),
+			Region:     "auto",
+			Bucket:     ko.String("upload.r2.bucket"),
+			BucketPath: ko.String("upload.r2.bucket_path"),
+			BucketType: "private",
+			Expiry:     expiry,
+			RootURL:    ko.String("app.root_url"),
+		})
+		if err != nil {
+			lo.Fatalf("error initializing r2 upload provider %s", err)
+		}
+		lo.Println("media upload provider: r2 (Cloudflare R2)")
 		return up
 
 	case "filesystem":
@@ -961,12 +1014,15 @@ func initHTTPServer(cfg *Config, urlCfg *UrlConfig, i *i18n.I18n, fs stuffbin.Fi
 		uploadProvider = ko.String("upload.provider")
 		uploadFsURI    = ko.String("upload.filesystem.upload_uri")
 		publicURL      = ko.String("upload.s3.public_url")
+		r2PublicURL    = ko.String("upload.r2.public_url")
 	)
 	switch {
 	case uploadProvider == "filesystem" && uploadFsURI != "":
 		srv.Static(uploadFsURI, ko.String("upload.filesystem.upload_path"))
 	case uploadProvider == "s3" && strings.HasPrefix(publicURL, "/"):
 		srv.GET(path.Join(publicURL, "/:filepath"), app.ServeS3Media)
+	case uploadProvider == "r2" && strings.HasPrefix(r2PublicURL, "/"):
+		srv.GET(path.Join(r2PublicURL, "/:filepath"), app.ServeS3Media)
 	}
 
 	// Register all HTTP handlers.

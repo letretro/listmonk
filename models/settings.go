@@ -80,6 +80,13 @@ type Settings struct {
 	UploadS3BucketPath         string   `json:"upload.s3.bucket_path"`
 	UploadS3BucketType         string   `json:"upload.s3.bucket_type"`
 	UploadS3Expiry             string   `json:"upload.s3.expiry"`
+	UploadR2AccountID          string   `json:"upload.r2.account_id"`
+	UploadR2AccessKeyID        string   `json:"upload.r2.access_key_id"`
+	UploadR2SecretAccessKey    string   `json:"upload.r2.secret_access_key,omitempty"`
+	UploadR2Bucket             string   `json:"upload.r2.bucket"`
+	UploadR2BucketPath         string   `json:"upload.r2.bucket_path"`
+	UploadR2PublicURL          string   `json:"upload.r2.public_url"`
+	UploadR2Expiry             string   `json:"upload.r2.expiry"`
 
 	SMTP []struct {
 		Name          string              `json:"name"`
@@ -113,6 +120,19 @@ type Settings struct {
 		Timeout       string `json:"timeout"`
 		MaxMsgRetries int    `json:"max_msg_retries"`
 	} `json:"messengers"`
+
+	ZeptoMail []struct {
+		UUID          string `json:"uuid"`
+		Enabled       bool   `json:"enabled"`
+		Name          string `json:"name"`
+		APIKey        string `json:"api_key,omitempty"`
+		FromEmail     string `json:"from_email"`
+		FromName      string `json:"from_name"`
+		TrackOpens    bool   `json:"track_opens"`
+		TrackClicks   bool   `json:"track_clicks"`
+		Timeout       string `json:"timeout"`
+		MaxMsgRetries int    `json:"max_msg_retries"`
+	} `json:"zeptomail"`
 
 	BounceEnabled        bool `json:"bounce.enabled"`
 	BounceEnableWebhooks bool `json:"bounce.webhooks_enabled"`

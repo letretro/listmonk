@@ -10,6 +10,9 @@
             <option value="s3">
               s3
             </option>
+            <option value="r2">
+              r2 (Cloudflare R2)
+            </option>
           </b-select>
         </b-field>
       </div>
@@ -92,6 +95,47 @@
           placeholder="https://files.yourdomain.com" :maxlength="200" type="string" pattern="(https?://.*|/.+)" />
       </b-field>
     </div><!-- s3 -->
+
+    <div class="block" v-if="data['upload.provider'] === 'r2'">
+      <b-field :label="$t('settings.media.r2.accountID')" label-position="on-border"
+        :message="$t('settings.media.r2.accountIDHelp')" expanded>
+        <b-input v-model="data['upload.r2.account_id']" name="upload.r2.account_id" :maxlength="200"
+          placeholder="your-cloudflare-account-id" />
+      </b-field>
+
+      <b-field :label="$t('settings.media.r2.key')" label-position="on-border" expanded>
+        <b-input v-model="data['upload.r2.access_key_id']" name="upload.r2.access_key_id" :maxlength="200" />
+      </b-field>
+
+      <b-field :label="$t('settings.media.r2.secret')" label-position="on-border" expanded
+        message="Enter a value to change.">
+        <b-input v-model="data['upload.r2.secret_access_key']" name="upload.r2.secret_access_key"
+          type="password" :maxlength="200" />
+      </b-field>
+
+      <b-field :label="$t('settings.media.r2.bucket')" label-position="on-border" expanded>
+        <b-input v-model="data['upload.r2.bucket']" name="upload.r2.bucket" :maxlength="200"
+          placeholder="" />
+      </b-field>
+
+      <b-field :label="$t('settings.media.r2.bucketPath')" label-position="on-border"
+        :message="$t('settings.media.r2.bucketPathHelp')" expanded>
+        <b-input v-model="data['upload.r2.bucket_path']" name="upload.r2.bucket_path" :maxlength="200"
+          placeholder="/" />
+      </b-field>
+
+      <b-field :label="$t('settings.media.r2.uploadExpiry')" label-position="on-border"
+        :message="$t('settings.media.r2.uploadExpiryHelp')" expanded>
+        <b-input v-model="data['upload.r2.expiry']" name="upload.r2.expiry" placeholder="167h" :pattern="regDuration"
+          :maxlength="10" />
+      </b-field>
+
+      <b-field :label="$t('settings.media.r2.publicURL')" label-position="on-border"
+        :message="$t('settings.media.r2.publicURLHelp')" expanded>
+        <b-input v-model="data['upload.r2.public_url']" name="upload.r2.public_url"
+          placeholder="https://files.yourdomain.com" :maxlength="200" type="string" pattern="(https?://.*|/.+)" />
+      </b-field>
+    </div><!-- r2 -->
   </div>
 </template>
 

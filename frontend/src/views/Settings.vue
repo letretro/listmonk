@@ -54,6 +54,10 @@
             <messenger-settings :form="form" :key="key" />
           </b-tab-item><!-- messengers -->
 
+          <b-tab-item :label="$t('settings.zeptomail.name')">
+            <zeptomail-settings :form="form" :key="key" />
+          </b-tab-item><!-- zeptomail -->
+
           <b-tab-item :label="$t('settings.appearance.name')">
             <appearance-settings :form="form" :key="key" />
           </b-tab-item><!-- appearance -->
@@ -72,6 +76,7 @@ import GeneralSettings from './settings/general.vue';
 import MediaSettings from './settings/media.vue';
 import MessengerSettings from './settings/messengers.vue';
 import PerformanceSettings from './settings/performance.vue';
+import ZeptoMailSettings from './settings/zeptomail.vue';
 import PrivacySettings from './settings/privacy.vue';
 import SecuritySettings from './settings/security.vue';
 import SmtpSettings from './settings/smtp.vue';
@@ -86,6 +91,7 @@ export default Vue.extend({
     SmtpSettings,
     BounceSettings,
     MessengerSettings,
+    ZeptoMailSettings,
     AppearanceSettings,
   },
 
@@ -196,6 +202,15 @@ export default Vue.extend({
           form.messengers[i].password = '';
         } else if (this.hasDummy(form.messengers[i].password)) {
           hasDummy = `messenger #${i + 1}`;
+        }
+      }
+
+      for (let i = 0; i < form.zeptomail.length; i += 1) {
+        // If it's the dummy UI API key placeholder, ignore it.
+        if (this.isDummy(form.zeptomail[i].api_key)) {
+          form.zeptomail[i].api_key = '';
+        } else if (this.hasDummy(form.zeptomail[i].api_key)) {
+          hasDummy = `zeptomail #${i + 1}`;
         }
       }
 

@@ -21,6 +21,7 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/knadh/listmonk/internal/auth"
 	"github.com/knadh/listmonk/internal/messenger/email"
+	"github.com/knadh/listmonk/internal/messenger/zeptomail"
 	"github.com/knadh/listmonk/internal/notifs"
 	"github.com/knadh/listmonk/models"
 	"github.com/labstack/echo/v4"
@@ -70,6 +71,10 @@ func (a *App) GetSettings(c echo.Context) error {
 	}
 	for i := range s.Messengers {
 		s.Messengers[i].Password = strings.Repeat(pwdMask, utf8.RuneCountInString(s.Messengers[i].Password))
+	}
+
+	for i := range s.ZeptoMail {
+		s.ZeptoMail[i].APIKey = strings.Repeat(pwdMask, utf8.RuneCountInString(s.ZeptoMail[i].APIKey))
 	}
 
 	s.UploadS3AwsSecretAccessKey = strings.Repeat(pwdMask, utf8.RuneCountInString(s.UploadS3AwsSecretAccessKey))
@@ -226,6 +231,30 @@ func (a *App) UpdateSettings(c echo.Context) error {
 
 		set.Messengers[i].Name = name
 		names[name] = true
+	}
+
+	for i, z := range set.ZeptoMail {
+		if z.UUID == "" {
+			set.ZeptoMail[i].UUID = uuid.Must(uuid.NewV4()).String()
+		}
+
+		if z.APIKey == "" {
+			for _, c := range cur.ZeptoMail {
+				if z.UUID == c.UUID {
+					set.ZeptoMail[i].APIKey = c.APIKey
+				}
+			}
+		}
+
+		name := reAlphaNum.ReplaceAllString(strings.ToLower(z.Name), "-")
+		if name != "" {
+			if _, ok := names[name]; ok {
+				return echo.NewHTTPError(http.StatusBadRequest,
+					a.i18n.Ts("settings.duplicateMessengerName", "name", name))
+			}
+			names[name] = true
+		}
+		set.ZeptoMail[i].Name = name
 	}
 
 	// S3 password?
@@ -422,6 +451,48 @@ func (a *App) TestSMTPSettings(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, okResp{a.bufLog.Lines()})
+}
+
+// TestZeptoMailSettings sends a test email through ZeptoMail to verify API configuration.
+func (a *App) TestZeptoMailSettings(c echo.Context) error {
+	var req struct {
+		zeptomail.Config
+		Email string `json:"email"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, a.i18n.Ts("globals.messages.internalError"))
+	}
+
+	if req.Email == "" {
+		return echo.NewHTTPError(http.StatusBadRequest,
+			a.i18n.Ts("globals.messages.missingFields", "name", "email"))
+	}
+
+	if req.APIKey == "" || req.APIKey == strings.Repeat(pwdMask, utf8.RuneCountInString(req.APIKey)) {
+		return echo.NewHTTPError(http.StatusBadRequest, a.i18n.T("settings.zeptomail.testEnterKey"))
+	}
+
+	if req.FromEmail == "" {
+		req.FromEmail = a.cfg.FromEmail
+	}
+
+	msgr, err := zeptomail.New(req.Config)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest,
+			a.i18n.Ts("globals.messages.errorCreating", "name", "ZeptoMail", "error", err.Error()))
+	}
+
+	m := models.Message{}
+	m.From = req.FromEmail
+	m.To = []string{req.Email}
+	m.Subject = a.i18n.T("settings.zeptomail.testConnection")
+	m.Body = []byte(a.i18n.T("settings.zeptomail.testBody"))
+
+	if err := msgr.Push(m); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, okResp{true})
 }
 
 func (a *App) GetAboutInfo(c echo.Context) error {
