@@ -32,7 +32,7 @@ type Config struct {
 	FromName      string        `json:"from_name"`
 	TrackOpens    bool          `json:"track_opens"`
 	TrackClicks   bool          `json:"track_clicks"`
-	Timeout       time.Duration `json:"timeout"`
+	Timeout       string `json:"timeout"`
 	MaxMsgRetries int           `json:"max_msg_retries"`
 }
 
@@ -89,8 +89,13 @@ type ZeptoMail struct {
 
 // New returns a new ZeptoMail messenger.
 func New(conf Config) (*ZeptoMail, error) {
-	if conf.Timeout == 0 {
-		conf.Timeout = 30 * time.Second
+	timeout := 30 * time.Second
+	if conf.Timeout != "" {
+		d, err := time.ParseDuration(conf.Timeout)
+		if err != nil {
+			return nil, fmt.Errorf("invalid timeout: %v", err)
+		}
+		timeout = d
 	}
 	if conf.Name == "" {
 		conf.Name = MessengerName
@@ -99,11 +104,11 @@ func New(conf Config) (*ZeptoMail, error) {
 	return &ZeptoMail{
 		conf: conf,
 		c: &http.Client{
-			Timeout: conf.Timeout,
+			Timeout: timeout,
 			Transport: &http.Transport{
 				MaxIdleConnsPerHost:   10,
 				MaxConnsPerHost:       10,
-				ResponseHeaderTimeout: conf.Timeout,
+				ResponseHeaderTimeout: timeout,
 				IdleConnTimeout:       90 * time.Second,
 			},
 		},
