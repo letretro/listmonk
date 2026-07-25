@@ -55,7 +55,7 @@
           </b-tab-item><!-- messengers -->
 
           <b-tab-item :label="$t('settings.zeptomail.name')">
-            <zeptomail-settings :form="form" :key="key" />
+            <zepto-mail-settings :form="form" :key="key" />
           </b-tab-item><!-- zeptomail -->
 
           <b-tab-item :label="$t('settings.appearance.name')">
