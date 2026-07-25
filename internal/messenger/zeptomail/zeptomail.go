@@ -151,11 +151,12 @@ func (z *ZeptoMail) Push(m models.Message) error {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
 		var ae apiError
-		if err := json.NewDecoder(resp.Body).Decode(&ae); err == nil && ae.Error.Message != "" {
+		if err := json.Unmarshal(bodyBytes, &ae); err == nil && ae.Error.Message != "" {
 			return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, ae.Error.Message)
 		}
-		return fmt.Errorf("zeptomail: API error (HTTP %d)", resp.StatusCode)
+		return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, string(bodyBytes))
 	}
 
 	return nil
