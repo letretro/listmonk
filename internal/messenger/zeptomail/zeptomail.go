@@ -17,7 +17,7 @@ import (
 
 const (
 	MessengerName  = "zeptomail"
-	apiBaseURL     = "https://api.zeptomail.com/v1.1/email"
+	apiBaseURL     = "https://api.zeptomail.in/v1.1/email"
 	authHeaderKey  = "Authorization"
 	authScheme     = "Zoho-enczapikey"
 	hdrContentType = "Content-Type"
