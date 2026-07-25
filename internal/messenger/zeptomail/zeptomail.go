@@ -78,7 +78,10 @@ type apiHeader struct {
 
 // apiError represents an error response from ZeptoMail.
 type apiError struct {
-	Message string `json:"message"`
+	Error struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	} `json:"error"`
 }
 
 // ZeptoMail is the ZeptoMail HTTP API messenger.
@@ -149,8 +152,8 @@ func (z *ZeptoMail) Push(m models.Message) error {
 
 	if resp.StatusCode != http.StatusOK {
 		var ae apiError
-		if err := json.NewDecoder(resp.Body).Decode(&ae); err == nil && ae.Message != "" {
-			return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, ae.Message)
+		if err := json.NewDecoder(resp.Body).Decode(&ae); err == nil && ae.Error.Message != "" {
+			return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, ae.Error.Message)
 		}
 		return fmt.Errorf("zeptomail: API error (HTTP %d)", resp.StatusCode)
 	}
