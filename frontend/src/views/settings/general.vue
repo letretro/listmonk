@@ -7,26 +7,26 @@
 
     <b-field :label="$t('settings.general.rootURL')" label-position="on-border"
       :message="$t('settings.general.rootURLHelp')">
-      <b-input v-model="data['app.root_url']" name="app.root_url" placeholder="https://listmonk.yoursite.com"
+      <b-input v-model="data['app.root_url']" name="app.root_url" placeholder="https://letretro.yoursite.com"
         :maxlength="300" required type="url" pattern="https?://.*" />
     </b-field>
 
     <b-field :label="$t('settings.general.logoURL')" label-position="on-border"
       :message="$t('settings.general.logoURLHelp')">
-      <b-input v-model="data['app.logo_url']" name="app.logo_url" placeholder="https://listmonk.yoursite.com/logo.png"
+      <b-input v-model="data['app.logo_url']" name="app.logo_url" placeholder="https://letretro.yoursite.com/logo.png"
         :maxlength="300" type="url" pattern="https?://.*" />
     </b-field>
     <b-field :label="$t('settings.general.faviconURL')" label-position="on-border"
       :message="$t('settings.general.faviconURLHelp')">
       <b-input v-model="data['app.favicon_url']" name="app.favicon_url"
-        placeholder="https://listmonk.yoursite.com/favicon.png" :maxlength="300" type="url" pattern="https?://.*" />
+        placeholder="https://letretro.yoursite.com/favicon.png" :maxlength="300" type="url" pattern="https?://.*" />
     </b-field>
 
     <hr />
     <b-field :label="$t('settings.general.fromEmail')" label-position="on-border"
       :message="$t('settings.general.fromEmailHelp')">
       <b-input v-model="data['app.from_email']" name="app.from_email"
-        placeholder="Listmonk <noreply@listmonk.yoursite.com>" pattern="((.+?)\s)?<(.+?)@(.+?)>" :maxlength="300" />
+        placeholder="LetRetro <noreply@letretro.yoursite.com>" pattern="((.+?)\s)?<(.+?)@(.+?)>" :maxlength="300" />
     </b-field>
     <b-field :label="$t('settings.general.adminNotifEmails')" label-position="on-border"
       :message="$t('settings.general.adminNotifEmailsHelp')">
