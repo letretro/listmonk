@@ -5,7 +5,7 @@ RUN mkdir -p /static/public/static/ && yarn install --frozen-lockfile
 COPY frontend/ .
 RUN npx vite build
 
-FROM golang:alpine AS builder
+FROM golang:1.26-alpine AS builder
 WORKDIR /build
 COPY go.mod go.sum ./
 RUN go mod download

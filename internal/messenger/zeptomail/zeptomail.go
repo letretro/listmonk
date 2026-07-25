@@ -128,8 +128,23 @@ func (z *ZeptoMail) Name() string {
 	return z.conf.Name
 }
 
-// Push sends an email through the ZeptoMail API.
+// Push sends an email through the ZeptoMail API with retry on failure.
 func (z *ZeptoMail) Push(m models.Message) error {
+	var lastErr error
+	for i := 0; i < 2; i++ {
+		if i > 0 {
+			time.Sleep(500 * time.Millisecond)
+		}
+		lastErr = z.pushOnce(m)
+		if lastErr == nil {
+			return nil
+		}
+	}
+	return lastErr
+}
+
+// pushOnce sends a single email request to the ZeptoMail API.
+func (z *ZeptoMail) pushOnce(m models.Message) error {
 	p := z.buildPayload(m)
 
 	body, err := json.Marshal(p)

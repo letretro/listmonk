@@ -21,5 +21,10 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/*.local
+**/screenshots
 LICENSE
 README.md
+*.toml.sample
+frontend/dist
+frontend/node_modules
