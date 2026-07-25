@@ -1,7 +1,7 @@
 FROM node:20-alpine AS frontend
 WORKDIR /build
 COPY frontend/package.json frontend/yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN mkdir -p /static/public/static/ && yarn install --frozen-lockfile
 COPY frontend/ .
 RUN yarn build
 
@@ -11,6 +11,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=frontend /build/dist ./frontend/dist/
+COPY --from=frontend /static/public/static/altcha.umd.js ./static/public/static/altcha.umd.js
 RUN CGO_ENABLED=0 go build -o listmonk ./cmd/
 
 FROM alpine:latest
