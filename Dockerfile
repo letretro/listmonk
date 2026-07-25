@@ -18,7 +18,8 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates tzdata shadow su-exec
 WORKDIR /listmonk
 COPY --from=builder /build/listmonk .
-COPY --from=builder /build/config.toml.sample config.toml
+COPY --from=builder /build/config.toml.sample ./config.toml.sample
+COPY --from=builder /build/config.toml.sample ./config.toml
 COPY --from=builder /build/queries ./queries/
 COPY --from=builder /build/schema.sql .
 COPY --from=builder /build/permissions.json .
