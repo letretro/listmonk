@@ -484,6 +484,9 @@ func (a *App) TestZeptoMailSettings(c echo.Context) error {
 
 	m := models.Message{}
 	m.From = req.FromEmail
+	if req.FromName != "" {
+		m.From = req.FromName + " <" + req.FromEmail + ">"
+	}
 	m.To = []string{req.Email}
 	m.Subject = a.i18n.T("settings.zeptomail.testConnection")
 	m.Body = []byte(a.i18n.T("settings.zeptomail.testBody"))

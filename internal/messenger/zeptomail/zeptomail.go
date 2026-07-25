@@ -156,19 +156,19 @@ func (z *ZeptoMail) Push(m models.Message) error {
 		resp.Body.Close()
 	}()
 
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return fmt.Errorf("zeptomail: API error (HTTP %d): failed to read response body: %v", resp.StatusCode, err)
-		}
-		var ae apiError
-		if err := json.Unmarshal(bodyBytes, &ae); err == nil && ae.Error.Message != "" {
-			return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, ae.Error.Message)
-		}
-		return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, string(bodyBytes))
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated {
+		return nil
 	}
 
-	return nil
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("zeptomail: API error (HTTP %d): failed to read response body: %v", resp.StatusCode, err)
+	}
+	var ae apiError
+	if err := json.Unmarshal(bodyBytes, &ae); err == nil && ae.Error.Message != "" {
+		return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, ae.Error.Message)
+	}
+	return fmt.Errorf("zeptomail: API error (HTTP %d): %s", resp.StatusCode, string(bodyBytes))
 }
 
 // Flush is a no-op for ZeptoMail.
